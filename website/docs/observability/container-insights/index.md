@@ -32,3 +32,14 @@ Before you begin, make sure you have the following tools installed and configure
    aws iam attach-role-policy \
    --role-name my-worker-node-role \
    --policy-arn arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
+### Installing the CloudWatch Observability EKS Add-on
+
+To install the **CloudWatch Observability EKS add-on**, follow these steps:
+
+1. **Install the Add-on Using `eksctl`:**
+
+   ```bash
+   eksctl create addon --name cloudwatch-observability \
+   --cluster <cluster-name> \
+   --region <region> \
+   --service-account-role-arn arn:aws:iam::<account-id>:role/<worker-node-role-name>
