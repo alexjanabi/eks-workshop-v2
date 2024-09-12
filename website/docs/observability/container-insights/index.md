@@ -14,7 +14,7 @@ Prepare your environment for this section:
 $ prepare-environment observability/container-insights
 ```
 
-This will make the following changes to your lab environments:
+This will make the following changes to your lab environment:
 
 - Install the OpenTelemetry operator
 - Create an IAM role for the ADOT collector to access CloudWatch
