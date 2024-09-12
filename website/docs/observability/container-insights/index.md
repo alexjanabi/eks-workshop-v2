@@ -32,6 +32,7 @@ Before you begin, make sure you have the following tools installed and configure
    aws iam attach-role-policy \
    --role-name my-worker-node-role \
    --policy-arn arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
+
 ### Installing the CloudWatch Observability EKS Add-on
 
 To install the **CloudWatch Observability EKS add-on**, follow these steps:
@@ -43,3 +44,15 @@ To install the **CloudWatch Observability EKS add-on**, follow these steps:
    --cluster <cluster-name> \
    --region <region> \
    --service-account-role-arn arn:aws:iam::<account-id>:role/<worker-node-role-name>
+Replace <cluster-name>, <region>, <account-id>, and <worker-node-role-name> with your own values.
+
+2. **Verify the Installation:**
+
+   Use the following command to verify that the add-on has been installed successfully:
+
+   ```bash
+   kubectl get daemonset -n amazon-cloudwatch
+
+This command checks if the CloudWatch daemonset is running, which confirms that Container Insights is monitoring your EKS cluster.
+
+
