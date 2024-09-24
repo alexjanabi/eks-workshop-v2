@@ -26,7 +26,7 @@ Before you begin, make sure you have the following tools installed and configure
 1. **AWS CLI** – Install the AWS CLI by following the [installation guide](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html).
 2. **eksctl** – Install `eksctl` using the [installation instructions](https://eksctl.io/introduction/#installation).
 3. **kubectl** – Install `kubectl` by following the [Kubernetes official guide](https://kubernetes.io/docs/tasks/tools/install-kubectl/).
-4. **IAM Role Permissions** – Attach the AWS managed policy `CloudWatchAgentServerPolicy` to your worker node IAM role to allow access to CloudWatch:
+4. **IAM Role Permissions** – First, set up the necessary permissions by attaching the `CloudWatchAgentServerPolicy` IAM policy to your worker nodes. To do so, enter the following command. Replace **my-worker-node-role** with the IAM role used by your Kubernetes worker nodes.
 
    ```bash
    aws iam attach-role-policy \
