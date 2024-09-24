@@ -40,11 +40,9 @@ To install the **CloudWatch Observability EKS add-on**, follow these steps:
 1. **Install the Add-on Using `eksctl`:**
 
    ```bash
-   eksctl create addon --name cloudwatch-observability \
-   --cluster <cluster-name> \
-   --region <region> \
-   --service-account-role-arn arn:aws:iam::<account-id>:role/<worker-node-role-name>
-Replace <cluster-name>, <region>, <account-id>, and <worker-node-role-name> with your own values.
+   aws eks create-addon --cluster-name <cluster-name> \
+    --addon-name amazon-cloudwatch-observability
+Replace <cluster-name> with your own cluster name values.
 
 2. **Verify the Installation:**
 
