@@ -3,7 +3,7 @@ title: "Cluster metrics"
 sidebar_position: 10
 ---
 
-# Guide: Viewing and Analyzing EKS Cluster Metrics with CloudWatch Container Insights
+# Viewing and Analyzing EKS Cluster Metrics with CloudWatch Container Insights
 
 ## Introduction
 This guide will help you navigate and analyze metrics from your Amazon EKS clusters using AWS CloudWatch **Container Insights**. You will learn how to access key performance metrics and use them to monitor the health and performance of your Kubernetes clusters.
@@ -17,12 +17,12 @@ Once Container Insights is enabled on your EKS cluster, you can easily view your
 2. In the services search bar, type **CloudWatch**, then click on it.
 3. On the left-hand side, expand **Container Insights**, and select **Performance Monitoring**.
 
-![CloudWatch Console](./images/cloudwatch-console.png)
+![CloudWatch Console](./assets/cloudwatch-console.png)
 
 ### Step 2: Select the EKS Cluster
 1. Once in the **Performance Monitoring** section, you will see a list of available Kubernetes clusters. Select your Amazon EKS cluster.
 
-![Cluster Selection](./images/cluster-selection.png)
+![Cluster Selection](./assets/cluster-selection.png)
 
 ### Step 3: View Cluster Overview
 1. After selecting the cluster, you'll see an **Overview** dashboard. This shows you real-time metrics for:
@@ -30,7 +30,7 @@ Once Container Insights is enabled on your EKS cluster, you can easily view your
    - **Memory usage**
    - **Network traffic**
 
-![Cluster Overview](./images/cluster-overview.png)
+![Cluster Overview](./assets/cluster-overview.png)
 
 ## 2. Analyzing CPU, Memory, and Network Metrics
 
@@ -38,20 +38,20 @@ Once Container Insights is enabled on your EKS cluster, you can easily view your
 1. In the **Overview** dashboard, click on the **CPU Utilization** section to dive deeper into CPU metrics.
 2. You’ll see breakdowns for CPU usage by node, pod, and container.
 
-![CPU Utilization](./images/cpu-utilization.png)
+![CPU Utilization](./assets/cpu-utilization.png)
 
 ### Step 2: Analyzing Memory Utilization
 1. Click on the **Memory Utilization** tab to view the memory usage of your cluster.
 2. You can see the memory consumption by each node, pod, and container.
 3. Look for any **high memory usage** nodes or pods to identify potential bottlenecks.
 
-![Memory Utilization](./images/memory-utilization.png)
+![Memory Utilization](./assets/memory-utilization.png)
 
 ### Step 3: Analyzing Network Traffic
 1. Select the **Network Traffic** tab to view data on incoming and outgoing network traffic in your cluster.
 2. Use this to monitor spikes in network activity that could affect cluster performance.
 
-![Network Traffic](./images/network-traffic.png)
+![Network Traffic](./assets/network-traffic.png)
 
 ## 3. Drill Down into Pod-Level and Node-Level Metrics
 
