@@ -3,92 +3,104 @@ title: "Cluster metrics"
 sidebar_position: 10
 ---
 
-We're going to explore how to enable CloudWatch Container Insights metrics for an EKS cluster with the ADOT Collector. The first thing we'll need to do is create a collector in our cluster to gather metrics related to various aspects of the cluster such as nodes, pods and containers.
+# Guide: Viewing and Analyzing EKS Cluster Metrics with CloudWatch Container Insights
 
-You can view the full collector manifest below, then we'll break it down.
+## Introduction
+This guide will help you navigate and analyze metrics from your Amazon EKS clusters using AWS CloudWatch **Container Insights**. You will learn how to access key performance metrics and use them to monitor the health and performance of your Kubernetes clusters.
 
-<details>
-  <summary>Expand for full collector manifest</summary>
+## 1. Accessing Cluster Metrics via CloudWatch Container Insights
 
-::yaml{file="manifests/modules/observability/container-insights/adot/opentelemetrycollector.yaml"}
+Once Container Insights is enabled on your EKS cluster, you can easily view your cluster’s key metrics in the CloudWatch console.
 
-</details>
+### Step 1: Navigate to CloudWatch Console
+1. Sign in to the [AWS Management Console](https://aws.amazon.com/console/).
+2. In the services search bar, type **CloudWatch**, then click on it.
+3. On the left-hand side, expand **Container Insights**, and select **Performance Monitoring**.
 
-We can review this in several parts to make better sense of it.
+![CloudWatch Console](./images/cloudwatch-console.png)
 
-::yaml{file="manifests/modules/observability/container-insights/adot/opentelemetrycollector.yaml" zoomPath="spec.image" zoomAfter="1"}
+### Step 2: Select the EKS Cluster
+1. Once in the **Performance Monitoring** section, you will see a list of available Kubernetes clusters. Select your Amazon EKS cluster.
 
-The OpenTelemetry collector can run in several different modes depending on the telemetry it is collecting. In this case we'll run it as a DaemonSet so that a pod runs on each node in the EKS cluster. This allows us to collect telemetry from the node and container runtime.
+![Cluster Selection](./images/cluster-selection.png)
 
-Next we can start to break down the collector configuration itself.
+### Step 3: View Cluster Overview
+1. After selecting the cluster, you'll see an **Overview** dashboard. This shows you real-time metrics for:
+   - **CPU utilization** (cluster-wide, by pod, by node)
+   - **Memory usage**
+   - **Network traffic**
 
-::yaml{file="manifests/modules/observability/container-insights/adot/opentelemetrycollector.yaml" zoomPath="spec.config.receivers.awscontainerinsightreceiver" zoomBefore="2"}
+![Cluster Overview](./images/cluster-overview.png)
 
-First we'll configure the [AWS Container Insights Receiver](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/9da7fea0097b991b771e0999bc4cd930edb221e2/receiver/awscontainerinsightreceiver/README.md) to collect metrics from the node.
+## 2. Analyzing CPU, Memory, and Network Metrics
 
-::yaml{file="manifests/modules/observability/container-insights/adot/opentelemetrycollector.yaml" zoomPath="spec.config.processors"}
+### Step 1: Analyzing CPU Utilization
+1. In the **Overview** dashboard, click on the **CPU Utilization** section to dive deeper into CPU metrics.
+2. You’ll see breakdowns for CPU usage by node, pod, and container.
 
-Next we'll use a batch processor to reduce the number of API calls to CloudWatch by flushing metrics buffered over at most 60 seconds.
+![CPU Utilization](./images/cpu-utilization.png)
 
-::yaml{file="manifests/modules/observability/container-insights/adot/opentelemetrycollector.yaml" zoomPath="spec.config.exporters.awsemf/performance.namespace" zoomBefore="2" zoomAfter="1"}
+### Step 2: Analyzing Memory Utilization
+1. Click on the **Memory Utilization** tab to view the memory usage of your cluster.
+2. You can see the memory consumption by each node, pod, and container.
+3. Look for any **high memory usage** nodes or pods to identify potential bottlenecks.
 
-And now we'll use the [AWS CloudWatch EMF Exporter for OpenTelemetry Collector](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/exporter/awsemfexporter/README.md) to convert the OpenTelemetry metrics to [AWS CloudWatch Embedded Metric Format (EMF)](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Embedded_Metric_Format_Specification.html) and then send them directly to CloudWatch Logs using the [PutLogEvents](https://docs.aws.amazon.com/AmazonCloudWatchLogs/latest/APIReference/API_PutLogEvents.html) API. The log entries will be sent to the CloudWatch Logs log group shown and use the metrics will appear in the `ContainerInsights` namespace. This rest of this section is too long to view in full but see the complete manifest above.
+![Memory Utilization](./images/memory-utilization.png)
 
-::yaml{file="manifests/modules/observability/container-insights/adot/opentelemetrycollector.yaml" zoomPath="spec.config.service.pipelines"}
+### Step 3: Analyzing Network Traffic
+1. Select the **Network Traffic** tab to view data on incoming and outgoing network traffic in your cluster.
+2. Use this to monitor spikes in network activity that could affect cluster performance.
 
-Finally we need to use an OpenTelemetry pipeline to combine our receiver, processor and exporter.
+![Network Traffic](./images/network-traffic.png)
 
-We'll use the managed IAM policy `CloudWatchAgentServerPolicy` to provide the collector with the IAM permissions it needs via IAM Roles for Service Accounts to send the metrics to CloudWatch:
+## 3. Drill Down into Pod-Level and Node-Level Metrics
 
-```bash
-$ aws iam list-attached-role-policies \
-  --role-name eks-workshop-adot-collector-ci | jq .
-{
-  "AttachedPolicies": [
-    {
-      "PolicyName": "CloudWatchAgentServerPolicy",
-      "PolicyArn": "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
-    }
-  ]
-}
-```
+You can also drill down to get detailed metrics for individual nodes and pods.
 
-This IAM role will be added to the ServiceAccount for the collector:
+### Step 1: View Pod-Level Metrics
+1. In the **Performance Monitoring** section, click on the **Pods** tab.
+2. This page will display key metrics like:
+   - Pod CPU and memory usage
+   - Pod restarts (which can indicate crashes)
+   - Pod status (Running, Pending, etc.)
 
-```file
-manifests/modules/observability/container-insights/adot/serviceaccount.yaml
-```
+![Pod-Level Metrics](./images/pod-level-metrics.png)
 
-Create the resources we've explored above:
+### Step 2: View Node-Level Metrics
+1. Similarly, click on the **Nodes** tab to view performance metrics for individual nodes in your cluster.
+2. Use this page to identify any resource exhaustion or underperforming nodes.
 
-```bash
-$ kubectl kustomize ~/environment/eks-workshop/modules/observability/container-insights/adot \
-  | envsubst | kubectl apply -f- && sleep 5
-$ kubectl rollout status -n other daemonset/adot-container-ci-collector --timeout=120s
-```
+![Node-Level Metrics](./images/node-level-metrics.png)
 
-We can confirm that our collector is running by inspecting the Pods created by the DaemonSet:
+## 4. Setting Alarms for Cluster Metrics
 
-```bash hook=metrics
-$ kubectl get pod -n other -l app.kubernetes.io/name=adot-container-ci-collector
-NAME                               READY   STATUS    RESTARTS   AGE
-adot-container-ci-collector-5lp5g  1/1     Running   0          15s
-adot-container-ci-collector-ctvgs  1/1     Running   0          15s
-adot-container-ci-collector-w4vqs  1/1     Running   0          15s
-```
+CloudWatch allows you to set alarms on specific metrics, enabling you to monitor your cluster more proactively.
 
-This shows the collector is running and collecting metrics from the cluster. To view metrics first open the CloudWatch console and navigate to Container Insights:
+### Step 1: Create a New Alarm
+1. In the CloudWatch dashboard, go to **Alarms** > **Create Alarm**.
+2. Choose a metric to set an alarm for (e.g., **CPU utilization**).
+3. Set a threshold for the metric. For example, set an alarm when CPU utilization exceeds 80%.
 
-:::tip
-Please note that:
+![Create Alarm](./images/create-alarm.png)
 
-1. It may take a few minutes for data to start appearing in CloudWatch
-2. It is expected that some metrics are missing since they are provided by the [CloudWatch agent with enhanced observability](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Container-Insights-EKS-agent.html)
+### Step 2: Configure Alarm Actions
+1. Choose actions to take when the alarm is triggered, such as sending a notification via Amazon SNS or automatically scaling your EKS cluster.
 
-:::
+![Alarm Actions](./images/alarm-actions.png)
 
-<ConsoleButton url="https://console.aws.amazon.com/cloudwatch/home#container-insights:performance/EKS:Cluster?~(query~(controls~(CW*3a*3aEKS.cluster~(~'eks-workshop)))~context~())" service="cloudwatch" label="Open CloudWatch console"/>
+## 5. Viewing and Analyzing Logs in CloudWatch Logs Insights
 
-![ContainerInsightsConsole](./assets/container-insights-metrics-console.webp)
+In addition to metrics, CloudWatch collects logs from your EKS cluster. These logs can help you troubleshoot performance issues.
 
-You can take some time to explore around the console to see the various ways that metrics are presented such as by cluster, namespace or pod.
+### Step 1: Access Logs Insights
+1. From the CloudWatch Console, click **Logs Insights** in the left-hand panel.
+2. In the query editor, select your EKS log group.
+
+![Logs Insights](./images/logs-insights.png)
+
+### Step 2: Use Queries to Analyze Logs
+1. Use basic queries like:
+   ```bash
+   fields @timestamp, @message
+   | filter @message like /error/
+   | sort @timestamp desc
