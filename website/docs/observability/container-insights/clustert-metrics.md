@@ -15,9 +15,9 @@ Once Container Insights is enabled on your EKS cluster, you can easily view your
 ### Step 1: Navigate to CloudWatch Console
 1. Sign in to the [AWS Management Console](https://aws.amazon.com/console/).
 2. In the services search bar, type **CloudWatch**, then click on it.
-3. On the left-hand side, expand **Container Insights**, and select **Performance Monitoring**.
+3. On the left-hand side, click on **Container Insights**, and select **Service: EKS**.
 
-![CloudWatch Console](./assets/cloudwatch-console.png)
+![CloudWatch Console](./assets/container-insights.webp)
 
 ### Step 2: Select the EKS Cluster
 1. Once in the **Performance Monitoring** section, you will see a list of available Kubernetes clusters. Select your Amazon EKS cluster.
